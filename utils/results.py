@@ -144,6 +144,10 @@ def plot_timeseries(
             ax.set(
                 title="$\sigma_t^2 =${:.1f}$t$".format((j + 1) * 0.1)  # pylint: disable=anomalous-backslash-in-string
             )
+        else:
+            ax.set(
+                title="$\sigma_t^2 =${:.1f}".format((j + 1) * 0.1)  # pylint: disable=anomalous-backslash-in-string
+            )
 
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.1, hspace=0.4)
 
