@@ -150,6 +150,8 @@ def generate_autoregressive_forecast_dataset(
             params["horizon"] + params["length"] // 2 + random_state.geometric(p=2 / params["length"], size=n_samples)
         )
     else:
+        # by default params["length"]=15, params["horizon"]=5, n_samples = 2000 for training set.
+        # e.g. [15 + 5] * 2000 is [20 20 20 ... 20 20 20], the len is 2000
         sequence_lengths = np.array([params["length"] + params["horizon"]] * n_samples)
 
     # Noise profile-dependent settings
@@ -166,8 +168,10 @@ def generate_autoregressive_forecast_dataset(
         params["periodicity"] = setting
 
     # Create the input features of the generating process
+    # By default "mean": 1, "variance": 2, n_features = 1
     X_gen = [random_state.normal(params["mean"], params["variance"], (sl, n_features)) for sl in sequence_lengths]
 
+    # for dynamic_sequence_lengths == False, k is in range(0, params["length"] + params["horizon"])
     w = np.array([params["memory_factor"] ** k for k in range(np.max(sequence_lengths))])
 
     # X_full stores the time series values generated from features X_gen.
@@ -221,6 +225,7 @@ def get_raw_sequences(
             seed,
             n_train,
             ("-dynamic" if dynamic_sequence_lengths else ""),
+            # DEFAULT_PARAMETERS["horizon"] = 5
             ("-horizon{}".format(horizon) if horizon is not None and horizon != DEFAULT_PARAMETERS["horizon"] else ""),
         )
 
@@ -232,9 +237,11 @@ def get_raw_sequences(
             X_train, Y_train, sequence_lengths_train = generate_autoregressive_forecast_dataset(
                 n_samples=n_train,
                 experiment=experiment,
+                # setting is range(1, 6)
                 setting=setting,
                 dynamic_sequence_lengths=dynamic_sequence_lengths,
                 horizon=horizon,
+                # random_state = np.random.RandomState(seed)
                 random_state=random_state,
             )
 
@@ -300,7 +307,7 @@ def get_synthetic_dataset(raw_sequences, conformal=True, p_calibration=0.5, seed
     return synthetic_dataset
 
 
-def split_train_dataset(X_train, Y_train, sequence_lengths_train, n_calibration, seed=0):
+def split_train_dataset(X_train, Y_train, sequence_lengths_train, n_calibration=0.5, seed=0):
     """ Splits the train dataset into training and calibration sets. """
     n_train = len(X_train)
     idx_perm = np.random.RandomState(seed).permutation(n_train)
