@@ -22,7 +22,7 @@ class ElectricityDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, key: int):
         return self.X[key], self.Y[key], self.sequence_lengths[key]
-    
+
 
 def get_raw_electricity_data(cached=True):
     if cached:

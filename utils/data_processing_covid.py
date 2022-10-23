@@ -36,9 +36,11 @@ def get_raw_covid_data(cached=True):
             dataset.append(
                 df.loc[df["areaCode"] == area_code]  # pylint: disable=unsubscriptable-object
                 .sort_values("date")["newCasesByPublishDate"]
+                # select 150 data
                 .to_numpy()[-250:-100]
             )
         dataset = np.array(dataset)
+        # np.set_printoptions(threshold=np.inf)
         # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
         with open("data/covid.pkl", "wb") as f:
             pickle.dump(dataset, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -63,25 +65,34 @@ def get_covid_splits(
                 train_dataset, calibration_dataset, test_dataset = pickle.load(f)
     else:
         # raw_data shape(380, 150)
+        np.set_printoptions(threshold=np.inf)
         raw_data = get_raw_covid_data(cached=cached)
-        print(f'dataset = {raw_data}, raw_data length = {len(raw_data)}')
+        # print(f'dataset = {raw_data}, raw_data length = {len(raw_data)}')
         # X shape(380, 100)
         # Y shape(380, 50)
         X = raw_data[:, :length]
         Y = raw_data[:, length : length + horizon]
-        print(f'X = {X}, X length = {len(X)}')
-        print(f'Y = {Y}, Y length = {len(Y)}')
+        # print(f'X = {X}, X length = {len(X)}')
+        # print(f'Y = {Y}, Y length = {len(Y)}')
 
         perm = np.random.RandomState(seed=seed).permutation(n_train + n_calibration + n_test)
+        # print(f'perm = {perm}, perm length = {len(perm)}')
         train_idx = perm[:n_train]
         calibration_idx = perm[n_train : n_train + n_calibration]
         train_calibration_idx = perm[: n_train + n_calibration]
         test_idx = perm[n_train + n_calibration :]
+        # print(f'train_idx = {train_idx}, train_idx length = {len(train_idx)}')
+        # print(f'calibration_idx = {calibration_idx}, calibration_idx length = {len(calibration_idx)}')
+        # print(f'train_calibration_idx = {train_calibration_idx}, train_calibration_idx length = {len(train_calibration_idx)}')
+        # print(f'test_idx = {test_idx}, test_idx length = {len(test_idx)}')
 
         if conformal:
             X_train = X[train_idx]
             X_calibration = X[calibration_idx]
             X_test = X[test_idx]
+            print(f'X_train = {X_train}, X_train length = {len(X_train)}')
+            print(f'X_calibration = {X_calibration}, X_calibration length = {len(X_calibration)}')
+            print(f'X_test = {X_test}, X_test length = {len(X_test)}')
 
             scaler = StandardScaler()
             X_train_scaled = scaler.fit_transform(X_train)
