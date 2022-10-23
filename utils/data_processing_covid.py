@@ -39,6 +39,7 @@ def get_raw_covid_data(cached=True):
                 .to_numpy()[-250:-100]
             )
         dataset = np.array(dataset)
+        # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
         with open("data/covid.pkl", "wb") as f:
             pickle.dump(dataset, f, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -61,9 +62,15 @@ def get_covid_splits(
             with open("processed_data/covid_raw.pkl", "rb") as f:
                 train_dataset, calibration_dataset, test_dataset = pickle.load(f)
     else:
+        # raw_data shape(380, 150)
         raw_data = get_raw_covid_data(cached=cached)
+        print(f'dataset = {raw_data}, raw_data length = {len(raw_data)}')
+        # X shape(380, 100)
+        # Y shape(380, 50)
         X = raw_data[:, :length]
         Y = raw_data[:, length : length + horizon]
+        print(f'X = {X}, X length = {len(X)}')
+        print(f'Y = {Y}, Y length = {len(Y)}')
 
         perm = np.random.RandomState(seed=seed).permutation(n_train + n_calibration + n_test)
         train_idx = perm[:n_train]
@@ -121,3 +128,8 @@ def get_covid_splits(
             pickle.dump((X_test, Y[test_idx]), f, protocol=pickle.HIGHEST_PROTOCOL)
 
     return train_dataset, calibration_dataset, test_dataset
+
+if __name__ == '__main__':
+    # dataset = get_raw_covid_data(cached=False)
+    # print(dataset)
+    get_covid_splits(length=100, horizon=50, conformal=True, n_train=200, n_calibration=100, n_test=80, cached=False, seed=None)
