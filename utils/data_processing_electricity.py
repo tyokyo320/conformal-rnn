@@ -26,11 +26,11 @@ class ElectricityDataset(torch.utils.data.Dataset):
 
 def get_raw_electricity_data(cached=True) -> np.ndarray:
     if cached:
-        with open("data/electricity.pkl", "rb") as f:
+        with open("data/nyiso.pkl", "rb") as f:
             dataset = pickle.load(f)
     else:
         dataset = []
-        df = pd.read_csv("data/electricity.csv")
+        df = pd.read_csv("data/nyiso_daily.csv")
         print(df)
 
     return dataset
@@ -41,13 +41,13 @@ def get_electricity_splits(length=100, horizon=50, conformal=True, n_train=200, 
 
 
 def convert_daily_electricity_data() -> None:
-    df = pd.read_csv('data/LoadData.csv')
+    df = pd.read_csv('data/nyiso.csv')
     # Aggregating the dataset at daily level
     df['Timestamp'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %H:%M:%S')
     df.index = df['Timestamp']
     df = df.resample('D').mean()
     print(df)
-    df.to_csv('data/electricity_daily.csv')
+    df.to_csv('data/nyiso_daily.csv')
 
 
 def convert_monthly_electricity_data() -> None:
@@ -65,8 +65,8 @@ def convert_monthly_electricity_data() -> None:
     df.to_csv('data/electricity_monthly.csv')
 
 if __name__ == '__main__':
-    # convert_daily_electricity_data()
-    convert_monthly_electricity_data()
+    convert_daily_electricity_data()
+    # convert_monthly_electricity_data()
 
 
 
