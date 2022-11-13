@@ -12,6 +12,7 @@ from models.qrnn import QRNN
 from utils.data_processing_covid import get_covid_splits
 from utils.data_processing_eeg import get_eeg_splits
 from utils.data_processing_mimic import get_mimic_splits
+from utils.data_processing_electricity import get_electricity_splits
 from utils.performance import evaluate_cfrnn_performance, evaluate_performance
 
 BASELINES = {"CFRNN": CFRNN, "AdaptiveCFRNN": AdaptiveCFRNN, "DPRNN": DPRNN, "QRNN": QRNN}
@@ -19,7 +20,7 @@ BASELINES = {"CFRNN": CFRNN, "AdaptiveCFRNN": AdaptiveCFRNN, "DPRNN": DPRNN, "QR
 CONFORMAL_BASELINES = ["CFRNN", "AdaptiveCFRNN"]
 
 DEFAULT_MEDICAL_PARAMETERS = {
-    "batch_size": 150,
+    "batch_size": 5050,
     "embedding_size": 20,
     "coverage": 0.9,
     "lr": 0.01,
@@ -31,17 +32,17 @@ DEFAULT_MEDICAL_PARAMETERS = {
 # Epochs are counted differently in DPRNN and QRNN compared to CoRNN but
 # similar number of iterations are performed; see implementation details.
 EPOCHS = {
-    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000},
+    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 25000},
     "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000},
     "DPRNN": {"mimic": 10, "eeg": 10, "covid": 10},
     "QRNN": {"mimic": 10, "eeg": 10, "covid": 10},
 }
 
-DATASET_SPLIT_FUNCTIONS = {"mimic": get_mimic_splits, "eeg": get_eeg_splits, "covid": get_covid_splits}
+DATASET_SPLIT_FUNCTIONS = {"mimic": get_mimic_splits, "eeg": get_eeg_splits, "covid": get_covid_splits, "electricity": get_electricity_splits}
 
-HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50}
+HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50, "electricity": 50}
 
-TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100}  # 49 - horizon
+TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100, "electricity": 5000}  # 49 - horizon
 
 
 def run_medical_experiments(dataset, baseline, params=None, save_model=False, save_results=True, seed=0):
