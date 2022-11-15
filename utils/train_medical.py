@@ -20,19 +20,19 @@ BASELINES = {"CFRNN": CFRNN, "AdaptiveCFRNN": AdaptiveCFRNN, "DPRNN": DPRNN, "QR
 CONFORMAL_BASELINES = ["CFRNN", "AdaptiveCFRNN"]
 
 DEFAULT_MEDICAL_PARAMETERS = {
-    "batch_size": 5050,
+    "batch_size": 3,
     "embedding_size": 20,
     "coverage": 0.9,
     "lr": 0.01,
     "n_steps": 1000,
-    "input_size": 1,
+    "input_size": 395,
     "rnn_mode": "LSTM",
 }
 
 # Epochs are counted differently in DPRNN and QRNN compared to CoRNN but
 # similar number of iterations are performed; see implementation details.
 EPOCHS = {
-    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 25000},
+    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 50000},
     "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000},
     "DPRNN": {"mimic": 10, "eeg": 10, "covid": 10},
     "QRNN": {"mimic": 10, "eeg": 10, "covid": 10},
@@ -40,9 +40,9 @@ EPOCHS = {
 
 DATASET_SPLIT_FUNCTIONS = {"mimic": get_mimic_splits, "eeg": get_eeg_splits, "covid": get_covid_splits, "electricity": get_electricity_splits}
 
-HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50, "electricity": 50}
+HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50, "electricity": 30}
 
-TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100, "electricity": 5000}  # 49 - horizon
+TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100, "electricity": 365}  # 49 - horizon
 
 
 def run_medical_experiments(dataset, baseline, params=None, save_model=False, save_results=True, seed=0):
@@ -79,6 +79,7 @@ def run_medical_experiments(dataset, baseline, params=None, save_model=False, sa
             epochs=params["epochs"],
             lr=params["lr"],
             batch_size=params["batch_size"],
+            input_size=params['input_size'],
         )
 
         results = evaluate_cfrnn_performance(model, test_dataset)

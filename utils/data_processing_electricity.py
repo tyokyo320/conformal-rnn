@@ -47,8 +47,8 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
         dataset = []
         df = pd.read_csv("data/nyiso_daily.csv")
         for area in areas:
-            # select 5050 data
-            dataset.append(df[area].to_numpy()[-5150:-100])
+            # select 395 data
+            dataset.append(df[area].to_numpy()[-495:-100])
         
         dataset = np.array(dataset)
         # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
