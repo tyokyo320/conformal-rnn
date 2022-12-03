@@ -20,20 +20,20 @@ BASELINES = {"CFRNN": CFRNN, "AdaptiveCFRNN": AdaptiveCFRNN, "DPRNN": DPRNN, "QR
 CONFORMAL_BASELINES = ["CFRNN", "AdaptiveCFRNN"]
 
 DEFAULT_MEDICAL_PARAMETERS = {
-    "batch_size": 3,
+    "batch_size": 2,
     "embedding_size": 20,
     "coverage": 0.9,
     "lr": 0.01,
     "n_steps": 1000,
-    "input_size": 395,
+    "input_size": 1,
     "rnn_mode": "LSTM",
 }
 
 # Epochs are counted differently in DPRNN and QRNN compared to CoRNN but
 # similar number of iterations are performed; see implementation details.
 EPOCHS = {
-    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 50000},
-    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000},
+    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 30000},
+    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 30000},
     "DPRNN": {"mimic": 10, "eeg": 10, "covid": 10},
     "QRNN": {"mimic": 10, "eeg": 10, "covid": 10},
 }
@@ -68,6 +68,7 @@ def run_medical_experiments(dataset, baseline, params=None, save_model=False, sa
 
         model = BASELINES[baseline](
             embedding_size=params["embedding_size"],
+            input_size=params['input_size'],
             horizon=horizon,
             error_rate=1 - params["coverage"],
             mode=params["rnn_mode"],
@@ -79,7 +80,6 @@ def run_medical_experiments(dataset, baseline, params=None, save_model=False, sa
             epochs=params["epochs"],
             lr=params["lr"],
             batch_size=params["batch_size"],
-            input_size=params['input_size'],
         )
 
         results = evaluate_cfrnn_performance(model, test_dataset)
