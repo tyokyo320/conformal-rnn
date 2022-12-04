@@ -45,11 +45,12 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
             dataset = pickle.load(f)
     else:
         dataset = []
-        df = pd.read_csv("data/nyiso_daily.csv")
+        df = pd.read_csv("data/nyiso_15min.csv")
         for area in areas:
-            # select 395 data
-            dataset.append(df[area].to_numpy()[-495:-100])
-        
+            # [1 day -> 1 hour] select 300 data (length=288 + horizon=12)
+            # dataset.append(df[area].to_numpy()[-400:-100])
+            # [1 week -> 1 hour] select 2028 data (length=2016 + horizon=12)
+            dataset.append(df[area].to_numpy()[-2128:-100])
         dataset = np.array(dataset)
         # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
         with open("data/nyiso.pkl", "wb") as f:
@@ -58,7 +59,7 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
     return dataset
 
 
-def get_electricity_splits(length=365, horizon=30, conformal=True, n_train=6, n_calibration=3, n_test=2, cached=True, seed=None) -> ElectricityDataset:
+def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n_calibration=3, n_test=2, cached=True, seed=None) -> ElectricityDataset:
     if seed is None:
         seed = 0
     else:
@@ -149,7 +150,7 @@ def get_electricity_splits(length=365, horizon=30, conformal=True, n_train=6, n_
     return train_dataset, calibration_dataset, test_dataset
 
 
-def convert_daily_electricity_data() -> None:
+def _convert_daily_electricity_data() -> None:
     df = pd.read_csv('data/nyiso.csv')
     # Aggregating the dataset at daily level
     df['Timestamp'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %H:%M:%S')
@@ -159,7 +160,7 @@ def convert_daily_electricity_data() -> None:
     df.to_csv('data/nyiso_daily.csv')
 
 
-def convert_monthly_electricity_data() -> None:
+def _convert_monthly_electricity_data() -> None:
     df = pd.read_csv('data/LoadData.csv')
     # Aggregating the dataset at monthly level
     df['Time'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %H:%M:%S')

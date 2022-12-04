@@ -32,17 +32,17 @@ DEFAULT_MEDICAL_PARAMETERS = {
 # Epochs are counted differently in DPRNN and QRNN compared to CoRNN but
 # similar number of iterations are performed; see implementation details.
 EPOCHS = {
-    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 30000},
-    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 30000},
+    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 10000},
+    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 10000},
     "DPRNN": {"mimic": 10, "eeg": 10, "covid": 10},
     "QRNN": {"mimic": 10, "eeg": 10, "covid": 10},
 }
 
 DATASET_SPLIT_FUNCTIONS = {"mimic": get_mimic_splits, "eeg": get_eeg_splits, "covid": get_covid_splits, "electricity": get_electricity_splits}
 
-HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50, "electricity": 30}
+HORIZON_LENGTHS = {"mimic": 2, "eeg": 10, "covid": 50, "electricity": 12}
 
-TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100, "electricity": 365}  # 49 - horizon
+TIMESERIES_LENGTHS = {"mimic": 47, "eeg": 40, "covid": 100, "electricity": 2016}  # 49 - horizon
 
 
 def run_medical_experiments(dataset, baseline, params=None, save_model=False, save_results=True, seed=0):
