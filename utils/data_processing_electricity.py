@@ -45,12 +45,12 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
             dataset = pickle.load(f)
     else:
         dataset = []
-        df = pd.read_csv("data/nyiso_15min.csv")
+        df = pd.read_csv("data/nyiso_5min.csv")
         for area in areas:
             # [1 day -> 1 hour] select 300 data (length=288 + horizon=12)
             # dataset.append(df[area].to_numpy()[-400:-100])
             # [1 week -> 1 hour] select 2028 data (length=2016 + horizon=12)
-            dataset.append(df[area].to_numpy()[-2128:-100])
+            dataset.append(df[area].to_numpy()[0:2028])
         dataset = np.array(dataset)
         # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
         with open("data/nyiso.pkl", "wb") as f:
