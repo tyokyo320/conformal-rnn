@@ -20,7 +20,7 @@ BASELINES = {"CFRNN": CFRNN, "AdaptiveCFRNN": AdaptiveCFRNN, "DPRNN": DPRNN, "QR
 CONFORMAL_BASELINES = ["CFRNN", "AdaptiveCFRNN"]
 
 DEFAULT_MEDICAL_PARAMETERS = {
-    "batch_size": 2,
+    "batch_size": 5,
     "embedding_size": 20,
     "coverage": 0.9,
     "lr": 0.01,
@@ -32,8 +32,8 @@ DEFAULT_MEDICAL_PARAMETERS = {
 # Epochs are counted differently in DPRNN and QRNN compared to CoRNN but
 # similar number of iterations are performed; see implementation details.
 EPOCHS = {
-    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 10000},
-    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 10000},
+    "CFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 1000},
+    "AdaptiveCFRNN": {"mimic": 1000, "eeg": 100, "covid": 1000, "electricity": 1000},
     "DPRNN": {"mimic": 10, "eeg": 10, "covid": 10},
     "QRNN": {"mimic": 10, "eeg": 10, "covid": 10},
 }

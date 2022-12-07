@@ -59,7 +59,7 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
     return dataset
 
 
-def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n_calibration=3, n_test=2, cached=True, seed=None) -> ElectricityDataset:
+def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n_calibration=4, n_test=1, cached=True, seed=None) -> ElectricityDataset:
     if seed is None:
         seed = 0
     else:
