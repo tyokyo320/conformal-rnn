@@ -295,3 +295,6 @@ saved_models/**
 !saved_models/.keep
 
 *.png
+
+# log
+log
