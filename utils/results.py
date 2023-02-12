@@ -23,6 +23,7 @@ def get_joint_coverages(baseline, experiment, seeds=None):
         for result in results:
             dataset_coverages.append(result["Mean joint coverage"] * 100)
         coverages.append(dataset_coverages)
+    print(f'coverages = {coverages}')
     coverages = np.array(coverages)
     return coverages.mean(axis=0), coverages.std(axis=0)
 
@@ -37,6 +38,7 @@ def get_joint_medical_coverages(baseline, dataset, seeds=None, correct_conformal
         else:
             result = load_medical_results(dataset=dataset, baseline=baseline, seed=seed)
         coverages.append(result["Mean joint coverage"] * 100)
+    print(f'coverages = {coverages}')
     coverages = np.array(coverages)
     return coverages.mean(axis=0), coverages.std(axis=0)
 
@@ -60,6 +62,7 @@ def get_interval_widths(baseline, experiment, seeds=None):
 
     widths = np.array(widths)
     # datasets (average the horizons and seeds)
+    print(f'widths = {widths}')
     return widths.mean(axis=(0, 2)), widths.std(axis=(0, 2))
 
 
@@ -78,6 +81,7 @@ def get_medical_interval_widths(baseline, dataset, seeds=None, correct_conformal
 
     widths = np.array(widths)
     # datasets (average the horizons and seeds)
+    print(f'widths = {widths}')
     return widths.mean(), widths.std()
 
 
