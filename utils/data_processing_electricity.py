@@ -39,6 +39,24 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
         'NORTH',
         'WEST',
     ]
+    # train_idx = [ 4  9  2 10  6  1], calibration_idx = [7 8 3 0], test_idx = [5]
+    # train_dataset = [
+    #     HUDVL,
+    #     NORTH,
+    #     DUNWOD,
+    #     WEST,
+    #     MHKVL,
+    #     CENTRL,
+    # ]
+    # calibration_dataset = [
+    #     MILLWD,
+    #     N_Y_C_,
+    #     GENESE,
+    #     CAPITL,
+    # ]
+    # test_dateset = [
+    #     LONGIL,
+    # ]
 
     if cached:
         with open("data/nyiso.pkl", "rb") as f:
@@ -52,6 +70,7 @@ def get_raw_electricity_data(cached=True) -> np.ndarray:
             # [1 week -> 1 hour] select 2028 data (length=2016 + horizon=12)
             dataset.append(df[area].to_numpy()[0:2028])
         dataset = np.array(dataset)
+        # print each column of data
         # print(f'dataset = {dataset}, dataset length = {len(dataset)}')
         with open("data/nyiso.pkl", "wb") as f:
             pickle.dump(dataset, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -73,19 +92,24 @@ def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n
             with open("processed_data/nyiso_raw.pkl", "rb") as f:
                 train_dataset, calibration_dataset, test_dataset = pickle.load(f)
     else:
-        # raw_data shape(380, 150)
         np.set_printoptions(threshold=np.inf)
+        # raw_data shape(11, 2028)
         raw_data = get_raw_electricity_data(cached=cached)
         # print(f'dataset = {raw_data}, raw_data length = {len(raw_data)}')
-        # X shape(380, 100)
-        # Y shape(380, 50)
+        
+        # training sequence X shape(11, 2016)
         X = raw_data[:, :length]
-        Y = raw_data[:, length : length + horizon]
         # print(f'X = {X}, X length = {len(X)}')
+        # target sequence Y shape(11, 12)
+        Y = raw_data[:, length : length + horizon]
         # print(f'Y = {Y}, Y length = {len(Y)}')
 
+        # Randomly permute a sequence, or return a permuted range (perm = [ 4  9  2 10  6  1  7  8  3  0  5])
         perm = np.random.RandomState(seed=seed).permutation(n_train + n_calibration + n_test)
         # print(f'perm = {perm}, perm length = {len(perm)}')
+        
+        # train_idx shape(1, 6), calibration_idx shape(1, 4), train_calibration_idx shape(1, 10), test_idx shape(1, 1)
+        # train_idx = [ 4  9  2 10  6  1], calibration_idx = [7 8 3 0], test_idx = [5], train_calibration_idx = [ 4  9  2 10  6  1  7  8  3  0]
         train_idx = perm[:n_train]
         calibration_idx = perm[n_train : n_train + n_calibration]
         train_calibration_idx = perm[: n_train + n_calibration]
@@ -107,6 +131,9 @@ def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n
             X_train_scaled = scaler.fit_transform(X_train)
             X_test_scaled = scaler.transform(X_test)
             X_calibration_scaled = scaler.transform(X_calibration)
+            # print(f'X_train_scaled = {X_train_scaled}, X_train_scaled length = {len(X_train_scaled)}')
+            # print(f'X_test_scaled = {X_test_scaled}, X_test_scaled length = {len(X_test_scaled)}')
+            # print(f'X_calibration_scaled = {X_calibration_scaled}, X_calibration_scaled length = {len(X_calibration_scaled)}')
 
             train_dataset = ElectricityDataset(
                 torch.FloatTensor(X_train_scaled).reshape(-1, length, 1),
@@ -174,8 +201,8 @@ def _convert_monthly_electricity_data() -> None:
     print(df)
     df.to_csv('data/electricity_monthly.csv')
 
-# if __name__ == '__main__':
-    # convert_daily_electricity_data()
-    # convert_monthly_electricity_data()
-    # get_raw_electricity_data()
-    # get_electricity_splits(length=100, horizon=50, conformal=True, n_train=6, n_calibration=3, n_test=2, cached=False, seed=None)
+if __name__ == '__main__':
+    # _convert_daily_electricity_data()
+    # _convert_monthly_electricity_data()
+    get_raw_electricity_data()
+    get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n_calibration=4, n_test=1, cached=False, seed=None)

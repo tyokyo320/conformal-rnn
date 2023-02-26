@@ -74,6 +74,7 @@ def run_medical_experiments(dataset, baseline, params=None, save_model=False, sa
             mode=params["rnn_mode"],
         )
 
+        # CFRNN.fit()
         model.fit(
             train_dataset,
             calibration_dataset,
