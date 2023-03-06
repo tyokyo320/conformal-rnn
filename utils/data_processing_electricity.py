@@ -82,12 +82,17 @@ def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n
         # raw_data shape(11, 2028)
         raw_data = get_raw_electricity_data(cached=cached)
         # print(f'dataset = {raw_data}, raw_data length = {len(raw_data)}')
+
+        raw_data_transose = raw_data.transpose()
+        scaler = StandardScaler()
+        raw_data_transose_scaled = scaler.fit_transform(raw_data_transose)
+        raw_data_scaled = raw_data_transose_scaled.transpose()
         
         # training sequence X shape(11, 2016)
-        X = raw_data[:, :length]
+        X = raw_data_scaled[:, :length]
         # print(f'X = {X}, X length = {len(X)}')
         # target sequence Y shape(11, 12)
-        Y = raw_data[:, length : length + horizon]
+        Y = raw_data_scaled[:, length : length + horizon]
         # print(f'Y = {Y}, Y length = {len(Y)}')
 
         # Randomly permute a sequence, or return a permuted range (perm = [ 4  9  2 10  6  1  7  8  3  0  5])
@@ -113,43 +118,22 @@ def get_electricity_splits(length=2016, horizon=12, conformal=True, n_train=6, n
             # print(f'X_calibration = {X_calibration}, X_calibration length = {len(X_calibration)}')
             # print(f'X_test = {X_test}, X_test length = {len(X_test)}')
 
-            X_train_transpose = X_train.transpose()
-            X_calibration_transpose = X_calibration.transpose()
-            X_test_transpose = X_test.transpose()
-            # print(f'X_train_transpose = {X_train_transpose}, X_train_transpose length = {len(X_train_transpose)}')
-            # print(f'X_calibration_transpose = {X_calibration_transpose}, X_calibration_transpose length = {len(X_calibration_transpose)}')
-            # print(f'X_test_transpose = {X_test_transpose}, X_test_transpose length = {len(X_test_transpose)}')
-            # print(f'X_train_transpose shape = {X_train_transpose.shape}')
-
-            scaler = StandardScaler()
-            X_train_transpose_scaled = scaler.fit_transform(X_train_transpose)
-            X_test_transpose_scaled = scaler.fit_transform(X_test_transpose)
-            X_calibration_transpose_scaled = scaler.fit_transform(X_calibration_transpose)
-            # print(f'X_train_transpose_scaled = {X_train_transpose_scaled}, X_train_transpose_scaled length = {len(X_train_transpose_scaled)}')
-            # print(f'X_test_transpose_scaled = {X_test_transpose_scaled}, X_test_transpose_scaled length = {len(X_test_transpose_scaled)}')
-            # print(f'X_calibration_transpose_scaled = {X_calibration_transpose_scaled}, X_calibration_transpose_scaled length = {len(X_calibration_transpose_scaled)}')
-
-            X_train_scaled = X_train_transpose_scaled.transpose()
-            X_test_scaled = X_test_transpose_scaled.transpose()
-            X_calibration_scaled = X_calibration_transpose_scaled.transpose()
-            # print(f'X_train_scaled = {X_train_scaled}, X_train_scaled length = {len(X_train_scaled)}')
-
             train_dataset = ElectricityDataset(
-                torch.FloatTensor(X_train_scaled).reshape(-1, length, 1),
+                torch.FloatTensor(X_train).reshape(-1, length, 1),
                 torch.FloatTensor(Y[train_idx]).reshape(-1, horizon, 1),
                 torch.ones(len(train_idx), dtype=torch.int) * length,
             )
 
             calibration_dataset = ElectricityDataset(
-                torch.FloatTensor(X_calibration_scaled).reshape(-1, length, 1),
+                torch.FloatTensor(X_calibration).reshape(-1, length, 1),
                 torch.FloatTensor(Y[calibration_idx]).reshape(-1, horizon, 1),
                 torch.ones(len(calibration_idx)) * length,
             )
 
             test_dataset = ElectricityDataset(
-                torch.FloatTensor(X_test_scaled).reshape(-1, length, 1),
+                torch.FloatTensor(X_test).reshape(-1, length, 1),
                 torch.FloatTensor(Y[test_idx]).reshape(-1, horizon, 1),
-                torch.ones(len(X_test_scaled), dtype=torch.int) * length,
+                torch.ones(len(X_test), dtype=torch.int) * length,
             )
 
             with open("processed_data/nyiso_conformal.pkl", "wb") as f:
